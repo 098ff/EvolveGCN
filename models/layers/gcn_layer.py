@@ -15,7 +15,7 @@ class GCNLayer(tf.keras.layers.Layer):
         last_dim = tf.TensorShape(input_shape[1])[-1]
 
         self.kernel = self.add_weight(
-            'kernel',
+            name="kernel",
             shape=[last_dim, self.units],
             initializer=self.kernel_initializer,
             dtype=self.dtype,

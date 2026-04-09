@@ -19,7 +19,7 @@ LEARNING_RATE = 1e-3
 
 def reset_metrics(list_of_metrics):
     for m in list_of_metrics:
-        m.reset_states()
+        m.reset_state()
 
 
 dl = EllipticDatasetLoader(DATADIR, TEST_SHARE, FILTER_UNKNOWN,local_features_only=ONLY_LOCAL_FEATURE)

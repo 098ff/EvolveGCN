@@ -1,8 +1,6 @@
 import tensorflow as tf
 from typing import Tuple
 
-
-
 class GCNSkipLayer(tf.keras.layers.Layer):
     def __init__(self, units: int, activation=None, kernel_initializer="glorot_uniform", dtype=tf.float32):
         super(GCNSkipLayer, self).__init__(dtype=dtype)
@@ -16,13 +14,13 @@ class GCNSkipLayer(tf.keras.layers.Layer):
         last_dim_skip = tf.TensorShape(input_shape[2])[-1]
 
         self.kernel_nodes = self.add_weight(
-            'kernel_nodes',
+            name='kernel_nodes', 
             shape=[last_dim_nodes, self.units],
             initializer=self.kernel_initializer,
             dtype=self.dtype,
             trainable=True)
         self.kernel_skip = self.add_weight(
-            'kernel_skip',
+            name='kernel_skip', 
             shape=[last_dim_skip, self.units],
             initializer=self.kernel_initializer,
             dtype=self.dtype,

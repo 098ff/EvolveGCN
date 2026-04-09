@@ -11,12 +11,13 @@ FILTER_UNKNOWN = False
 ONLY_LOCAL_FEATURE = False
 CLASS_WEIGTHS = [0.7,0.29,0.01]
 TEST_SHARE = 0.3
-NUM_EPOCH = 500
+NUM_EPOCH = 10
+# NUM_EPOCH = 500
 LEARNING_RATE = 1e-3
 
 def reset_metrics(list_of_metrics):
     for m in list_of_metrics:
-        m.reset_states()
+        m.reset_state()
 
 
 dl = EllipticDatasetLoader(DATADIR, TEST_SHARE, FILTER_UNKNOWN,local_features_only=ONLY_LOCAL_FEATURE)
