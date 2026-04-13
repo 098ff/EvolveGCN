@@ -19,16 +19,34 @@ class GCNSkipLayer(tf.keras.layers.Layer):
             initializer=self.kernel_initializer,
             dtype=self.dtype,
             trainable=True)
+        
         self.kernel_skip = self.add_weight(
             name='kernel_skip', 
             shape=[last_dim_skip, self.units],
             initializer=self.kernel_initializer,
             dtype=self.dtype,
             trainable=True)
+        
+        # 🟢 สิ่งที่เพิ่มเข้ามา: Learnable Gating Parameter
+        self.alpha = self.add_weight(
+            name='alpha_gate',
+            shape=[1], # เป็นตัวเลข 1 ตัวสำหรับบาลานซ์น้ำหนักทั้งเลเยอร์
+            initializer=tf.keras.initializers.Constant(0.5), # เริ่มต้นที่ 0.5 (ให้น้ำหนัก 50/50 เท่ากัน)
+            dtype=self.dtype,
+            trainable=True)
+            
         self.built = True
 
     def call(self, inputs: Tuple[tf.SparseTensor,tf.Tensor,tf.Tensor], training=None, mask=None):
         adj, nodes, skip_input = inputs
         kernel_branch = tf.matmul(tf.sparse.sparse_dense_matmul(adj,nodes),self.kernel_nodes)
         skip_branch = tf.matmul(skip_input,self.kernel_skip)
-        return self.activation(kernel_branch + skip_branch)
+        
+        # 🟢 สิ่งที่เปลี่ยนไป: คุมน้ำหนักการบวกด้วย Gate
+        # ใช้ Sigmoid เพื่อบีบค่า alpha ให้อยู่ในช่วง 0.0 ถึง 1.0 เสมอ
+        gate = tf.nn.sigmoid(self.alpha) 
+        
+        # ถ่วงน้ำหนัก (ถ้า gate เข้าใกล้ 1 จะเน้น GCN, ถ้าเข้าใกล้ 0 จะเน้น Skip)
+        combined = (gate * kernel_branch) + ((1.0 - gate) * skip_branch)
+
+        return self.activation(combined)
