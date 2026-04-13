@@ -88,12 +88,18 @@ for epoch in range(NUM_EPOCH):
 
     print(f"Epoch: {epoch}")
     
-    # Print for Train
+    # พิมพ์ของ Train
     print(f"TRAIN Loss: {train_loss_metric.result():.5f} | "
+          f"Accuracy: {train_accuracy_metric.result():.4f} | "
+          f"Precision: {train_precision_metric.result():.5f} | "
+          f"Recall: {train_recall_metric.result():.5f} | "
           f"Micro F1: {train_f1_micro.result():.4f} | "
           f"Illicit F1: {train_f1_class.result()[illicit_idx]:.4f}")
     
-    # Print for Test
+    # พิมพ์ของ Test
     print(f"TEST Loss: {test_loss_metric.result():.5f} | "
+          f"Accuracy: {test_accuracy_metric.result():.4f} | "
+          f"Precision: {test_precision_metric.result():.5f} | "
+          f"Recall: {test_recall_metric.result():.5f} | "
           f"Micro F1: {test_f1_micro.result():.4f} | "
           f"Illicit F1: {test_f1_class.result()[illicit_idx]:.4f}")
