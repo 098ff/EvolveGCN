@@ -41,12 +41,17 @@ train_loss_metric = tf.keras.metrics.Mean()
 train_accuracy_metric = tf.keras.metrics.Accuracy()
 train_precision_metric = tf.keras.metrics.Precision()
 train_recall_metric = tf.keras.metrics.Recall()
+train_f1_class = tf.keras.metrics.F1Score(average=None, name='train_f1_class')
+train_f1_micro = tf.keras.metrics.F1Score(average='micro', name='train_f1_micro')
 test_loss_metric = tf.keras.metrics.Mean()
 test_accuracy_metric = tf.keras.metrics.Accuracy()
 test_precision_metric = tf.keras.metrics.Precision()
 test_recall_metric = tf.keras.metrics.Recall()
+test_f1_class = tf.keras.metrics.F1Score(average=None, name='test_f1_class')
+test_f1_micro = tf.keras.metrics.F1Score(average='micro', name='test_f1_micro')
 metrics = [train_loss_metric,train_accuracy_metric,train_precision_metric,train_recall_metric
-            ,test_loss_metric,test_accuracy_metric,test_precision_metric,test_recall_metric]
+            ,test_loss_metric,test_accuracy_metric,test_precision_metric,test_recall_metric,
+            train_f1_class, train_f1_micro, test_f1_class, test_f1_micro]
 
 for epoch in range(NUM_EPOCH):
     reset_metrics(metrics)
@@ -64,6 +69,8 @@ for epoch in range(NUM_EPOCH):
         train_accuracy_metric(tf.argmax(t,axis=-1), tf.argmax(logits,axis=-1), sample_weight=weigths)
         train_precision_metric(y_true, y_pred)
         train_recall_metric(y_true, y_pred)
+        train_f1_class.update_state(t, logits)
+        train_f1_micro.update_state(t, logits)
 
     for _, n, t, adj in dl.test_batch_iterator():
         logits, loss, weigths = run_model(adj, n, t)
@@ -74,10 +81,19 @@ for epoch in range(NUM_EPOCH):
         test_accuracy_metric(tf.argmax(t,axis=-1), tf.argmax(logits,axis=-1), sample_weight=weigths)
         test_precision_metric(y_true, y_pred)
         test_recall_metric(y_true, y_pred)
+        test_f1_class.update_state(t, logits)
+        test_f1_micro.update_state(t, logits)
 
-    print("Epoch: {}\nTRAIN Loss: {:.5}| Accuracy: {:.4}| Precision: {:.4}| Recall: {:.4}\nTEST Loss: {:.4}| Accuracy: {:.4}| Precision: {:.4}| Recall: {:.4}".format(
-        epoch, train_loss_metric.result().numpy(), train_accuracy_metric.result().numpy(),
-        train_precision_metric.result().numpy(),train_recall_metric.result().numpy(),
-        test_loss_metric.result().numpy(), test_accuracy_metric.result().numpy(),
-        test_precision_metric.result().numpy(),test_recall_metric.result().numpy()
-    ))
+    illicit_idx = 0 # กำหนด index ของคลาส Illicit
+
+    print(f"Epoch: {epoch}")
+    
+    # Print for Train
+    print(f"TRAIN Loss: {train_loss_metric.result():.5f} | "
+          f"Micro F1: {train_f1_micro.result():.4f} | "
+          f"Illicit F1: {train_f1_class.result()[illicit_idx]:.4f}")
+    
+    # Print for Test
+    print(f"TEST Loss: {test_loss_metric.result():.5f} | "
+          f"Micro F1: {test_f1_micro.result():.4f} | "
+          f"Illicit F1: {test_f1_class.result()[illicit_idx]:.4f}")
