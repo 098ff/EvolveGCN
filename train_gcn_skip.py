@@ -11,8 +11,8 @@ FILTER_UNKNOWN = False
 ONLY_LOCAL_FEATURE = False
 CLASS_WEIGTHS = [0.7,0.29,0.01]
 TEST_SHARE = 0.3
-NUM_EPOCH = 10
-# NUM_EPOCH = 500
+# NUM_EPOCH = 10
+NUM_EPOCH = 500
 LEARNING_RATE = 1e-3
 
 def reset_metrics(list_of_metrics):
